@@ -1,0 +1,18 @@
+{
+  "accounts": [
+    {
+      "id": "acc1",
+      "userId": "atJYRZ4gehMD",
+      "accountNumber": "12345-6",
+      "balance": 98998.65,
+      "transfer_password": "1234"
+    },
+    {
+      "id": "acc2",
+      "userId": "user2GPSd3kWDJcCc",
+      "accountNumber": "12345-8",
+      "balance": 67001.35,
+      "transfer_password": "4321"
+    }
+  ]
+}
