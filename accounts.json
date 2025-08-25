@@ -4,14 +4,14 @@
       "id": "acc1",
       "userId": "atJYRZ4gehMD",
       "accountNumber": "12345-6",
-      "balance": 98998.65,
+      "balance": 90986.2,
       "transfer_password": "1234"
     },
     {
       "id": "acc2",
       "userId": "user2GPSd3kWDJcCc",
       "accountNumber": "12345-8",
-      "balance": 67001.35,
+      "balance": 75013.8,
       "transfer_password": "4321"
     }
   ]

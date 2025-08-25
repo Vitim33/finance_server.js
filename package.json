@@ -1,7 +1,7 @@
 {
   "name": "finance_server",
   "version": "1.0.0",
-  "description": "",
+  "description": "��#\u0000 \u0000f\u0000i\u0000n\u0000a\u0000n\u0000c\u0000e\u0000_\u0000s\u0000e\u0000r\u0000v\u0000e\u0000r\u0000.\u0000j\u0000s\u0000\r\u0000 \u0000",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,5 +16,13 @@
     "body-parser": "^2.2.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vitim33/finance_server.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Vitim33/finance_server.js/issues"
+  },
+  "homepage": "https://github.com/Vitim33/finance_server.js#readme"
 }

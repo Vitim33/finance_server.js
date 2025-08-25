@@ -80,9 +80,6 @@ app.post("/accounts/set_transfer_password", authenticateToken, (req, res) => {
     if (account.userId !== req.user.id)
       return res.status(403).json({ error: "Acesso negado a esta conta" });
 
-    account.transfer_password = transfer_password;
-    fs.writeFileSync(accountsFilePath, JSON.stringify({ accounts }, null, 2));
-
     res.status(200).json({ message: "Senha de transferência definida/atualizada com sucesso" });
   } catch (error) {
     console.error(error);
@@ -90,10 +87,16 @@ app.post("/accounts/set_transfer_password", authenticateToken, (req, res) => {
   }
 });
 
-// Verificar senha de transferência
-app.post("/accounts/verify_transfer_password", authenticateToken, (req, res) => {
+// Trocar senha de transferência
+app.post("/accounts/change_transfer_password", authenticateToken, (req, res) => {
   try {
-    const { accountNumber } = req.body;
+    const { accountNumber, old_transfer_password, new_transfer_password } = req.body;
+
+    if (!accountNumber || !old_transfer_password || !new_transfer_password || !/^\d{4,}$/.test(new_transfer_password)) {
+      return res.status(400).json({
+        error: "Dados inválidos. Informe senha antiga e nova senha com no mínimo 4 dígitos numéricos."
+      });
+    }
 
     const data = JSON.parse(fs.readFileSync(accountsFilePath, "utf-8"));
     const accounts = data.accounts;
@@ -104,7 +107,47 @@ app.post("/accounts/verify_transfer_password", authenticateToken, (req, res) => 
     if (account.userId !== req.user.id)
       return res.status(403).json({ error: "Acesso negado a esta conta" });
 
-    if (account.transfer_password == "" || !/^\d{4,}$/.test(account.transfer_password)) {
+    // Precisa já ter senha cadastrada
+    if (!account.transfer_password) {
+      return res.status(400).json({ error: "Ainda não existe senha de transferência definida." });
+    }
+
+    // Valida a senha antiga
+    if (account.transfer_password !== old_transfer_password) {
+      return res.status(401).json({ error: "Senha atual incorreta." });
+    }
+
+     if (account.transfer_password == new_transfer_password) {
+      return res.status(401).json({ error: "A nova senha não pode ser igual a atual." });
+    }
+
+    // Atualiza com a nova senha
+    account.transfer_password = new_transfer_password;
+    fs.writeFileSync(accountsFilePath, JSON.stringify({ accounts }, null, 2));
+
+    res.status(200).json({ message: "Senha de transferência alterada com sucesso." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro interno no servidor" });
+  }
+});
+
+// Verificar senha de transferência
+app.post("/accounts/verify_transfer_password", authenticateToken, (req, res) => {
+  try {
+    const { accountNumber, transfer_password } = req.body;
+
+    const data = JSON.parse(fs.readFileSync(accountsFilePath, "utf-8"));
+    const accounts = data.accounts;
+
+    const account = accounts.find(acc => acc.accountNumber === accountNumber);
+
+    if (!account) return res.status(404).json({ error: "Conta não encontrada" });
+
+    if (account.userId !== req.user.id)
+      return res.status(403).json({ error: "Acesso negado a esta conta" });
+
+    if (!account.transfer_password) {
       return res.status(401).json({ code: "P404", error: "Senha de transferência não definida. Por favor, defina-a antes de transferir." });
     }
 
@@ -139,6 +182,10 @@ app.post("/accounts/transfer", authenticateToken, (req, res) => {
     }
 
     // Verificação da senha
+    if (!fromAccount.transfer_password) {
+      return res.status(401).json({ code:"P404", error: "Senha de transferência não definida. Por favor, defina-a antes de transferir." });
+    }
+
     if (fromAccount.transfer_password !== transfer_password) {
       return res.status(401).json({ code:"P401", error: "Senha de transferência incorreta" });
     }
@@ -167,6 +214,7 @@ app.post("/accounts/transfer", authenticateToken, (req, res) => {
     res.status(500).json({ error: "Erro interno no servidor" });
   }
 });
+
 
 // Rota: Register
 app.post("/register", (req, res) => {
