@@ -117,7 +117,7 @@ app.post("/accounts/change_transfer_password", authenticateToken, (req, res) => 
       return res.status(401).json({ error: "Senha atual incorreta." });
     }
 
-     if (account.transfer_password == new_transfer_password) {
+    if (account.transfer_password == new_transfer_password) {
       return res.status(401).json({ error: "A nova senha não pode ser igual a atual." });
     }
 
@@ -183,11 +183,11 @@ app.post("/accounts/transfer", authenticateToken, (req, res) => {
 
     // Verificação da senha
     if (!fromAccount.transfer_password) {
-      return res.status(401).json({ code:"P404", error: "Senha de transferência não definida. Por favor, defina-a antes de transferir." });
+      return res.status(401).json({ code: "P404", error: "Senha de transferência não definida. Por favor, defina-a antes de transferir." });
     }
 
     if (fromAccount.transfer_password !== transfer_password) {
-      return res.status(401).json({ code:"P401", error: "Senha de transferência incorreta" });
+      return res.status(401).json({ code: "P401", error: "Senha de transferência incorreta" });
     }
 
     if (amount <= 0) {
@@ -214,6 +214,36 @@ app.post("/accounts/transfer", authenticateToken, (req, res) => {
     res.status(500).json({ error: "Erro interno no servidor" });
   }
 });
+
+// Rota: Get Balance
+app.get("/accounts/:accountId/balance", authenticateToken, (req, res) => {
+  try {
+    const { accountId } = req.params;
+
+    // Lendo dados do arquivo
+    const data = JSON.parse(fs.readFileSync(accountsFilePath, "utf-8"));
+    const accounts = data.accounts;
+
+    // Busca a conta pelo id
+    const account = accounts.find(acc => acc.id === accountId);
+
+    if (!account) {
+      return res.status(404).json({ error: "Conta não encontrada" });
+    }
+
+    // Verifica se a conta pertence ao usuário logado
+    if (account.userId !== req.user.id) {
+      return res.status(403).json({ error: "Acesso negado a esta conta" });
+    }
+
+    // Retorna apenas o saldo
+    res.status(200).json({ balance: account.balance });
+  } catch (error) {
+    console.error("Erro ao buscar saldo:", error);
+    res.status(500).json({ error: "Erro interno no servidor" });
+  }
+});
+
 
 
 // Rota: Register
@@ -300,14 +330,14 @@ app.post("/login", (req, res) => {
   );
 
   res.json({
-  message: "Login realizado com sucesso",
-  token,
-  user: {
-    id: user.id,
-    username: user.username,
-    email: user.email
-  }
-});
+    message: "Login realizado com sucesso",
+    token,
+    user: {
+      id: user.id,
+      username: user.username,
+      email: user.email
+    }
+  });
 
 });
 
