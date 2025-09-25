@@ -15,6 +15,14 @@ const usersFilePath = path.join(__dirname, "users.json");
 // Caminho para o arquivo de contas
 const accountsFilePath = path.join(__dirname, "accounts.json");
 
+function olaMundo() {
+  return "Olá, Mundo!";
+}
+
+app.get("/ping", (req, res) => {
+  res.send(olaMundo());
+});
+
 // Rota: Get Account by userId
 app.get("/accounts/:userId", authenticateToken, (req, res) => {
   try {
