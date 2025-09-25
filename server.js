@@ -88,6 +88,10 @@ app.post("/accounts/set_transfer_password", authenticateToken, (req, res) => {
     if (account.userId !== req.user.id)
       return res.status(403).json({ error: "Acesso negado a esta conta" });
 
+    // Atualiza com a nova senha
+    account.transfer_password = transfer_password;
+    fs.writeFileSync(accountsFilePath, JSON.stringify({ accounts }, null, 2));
+
     res.status(200).json({ message: "Senha de transferência definida/atualizada com sucesso" });
   } catch (error) {
     console.error(error);
